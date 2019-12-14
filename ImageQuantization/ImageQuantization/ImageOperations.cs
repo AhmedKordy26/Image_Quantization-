@@ -41,7 +41,7 @@ namespace ImageQuantization
         static int numColors;
         static double mstCost;
         static double[,] adjMatrix;
-        private static double euclideanDistance(RGBPixel first, RGBPixel second)
+        private static double euclideanDistance(RGBPixel first, RGBPixel second)//O(1)
         {
             double x = (first.red - second.red) * (first.red - second.red);
             double y = (first.green - second.green) * (first.green - second.green);
@@ -49,36 +49,21 @@ namespace ImageQuantization
             return Math.Sqrt(x + y + z);
         }
         
-        bool compare(edge a,edge b)
+        bool compare(edge a,edge b)//O(1)
         {
             return a.cost < b.cost;
         }
-        public static double generateMstCost()
+        public static double generateMstCost(List<edge> allEdges ) // O(E log V) where n is the number of distinct colors
         {
 
-            //  PriorityQueue<edge> PQ = new PriorityQueue<edge>();
-            List<edge> PQ = new List<edge>();
-            edge tmp=new edge();
-            for (int i = 0; i < numColors; ++i) //  adjMatrix
-            {
-                for (int j = 0; j < numColors; ++j)
-                {
-                    if(i!=j)
-                    {
-                        tmp.from = i;
-                        tmp.to = j;
-                        tmp.cost = adjMatrix[i, j];
-                        PQ.Add(tmp);
-                    }
-                }
-            }
-            PQ.Sort((s1, s2) => s1.cost.CompareTo(s2.cost));
+            allEdges.Sort((s1, s2) => s1.cost.CompareTo(s2.cost));// O (E log E )
             DSU UF = new DSU(numColors * numColors);
             mstCost = 0;
             int cur = 0;
-            while(cur<PQ.Count)
+            edge tmp = new edge();
+            while (cur< allEdges.Count)// O ( E log V )
             {
-                tmp = PQ[cur];
+                tmp = allEdges[cur];
                 if(UF.IsSameGroup(tmp.from,tmp.to)==false)
                 {
                     mstCost += tmp.cost;
@@ -87,8 +72,6 @@ namespace ImageQuantization
                 cur++;
             }
             Console.WriteLine(mstCost);
-            PQ = null;
-            UF = null;
             return mstCost;
         }
         public static int get_numColors()
@@ -160,11 +143,11 @@ namespace ImageQuantization
         }
 
         //////////////////////// Constructing Graph //////
-        public static void ConstructGraph(RGBPixel[,] ImageMatrix)
+        public static double ConstructGraph(RGBPixel[,] ImageMatrix) // O( N*M) where N is the width and M is the height
         {
             HashSet<RGBPixel> UniquePixelSet = new HashSet<RGBPixel>();
             List<RGBPixel> UniquePixelList = new List<RGBPixel>();
-            for (int x = 0; x < GetHeight(ImageMatrix); ++x)
+            for (int x = 0; x < GetHeight(ImageMatrix); ++x)// O( N*M) where N is the width and M is the height
             {
                 for (int y = 0; y < GetWidth(ImageMatrix); ++y)
                 {
@@ -177,14 +160,29 @@ namespace ImageQuantization
             }
             numColors = UniquePixelSet.Count;
             adjMatrix = new double[UniquePixelSet.Count+1,UniquePixelSet.Count+1];
-            for(int i=0;i<numColors;++i) //  adjMatrix
+            for(int i=0;i<numColors;++i) //  adjMatrix // O(N^2) where N is the number of distinct colors
             {
                 for(int j=0;j<numColors;++j)
                 {
                     adjMatrix[i, j] = euclideanDistance(UniquePixelList[i],UniquePixelList[j]);
                 }
             }
-            generateMstCost();
+            List<edge> allEdges = new List<edge>();
+            edge tmp = new edge();
+            for (int i = 0; i < numColors; ++i) //  adjMatrix // O(N^2)
+            {
+                for (int j = 0; j < numColors; ++j)
+                {
+                    if (i != j)
+                    {
+                        tmp.from = i;
+                        tmp.to = j;
+                        tmp.cost = adjMatrix[i, j];
+                        allEdges.Add(tmp);
+                    }
+                }
+            }
+            return generateMstCost(allEdges);// O (N^2)
         }
         //////////////////////////////
         /// <summary>

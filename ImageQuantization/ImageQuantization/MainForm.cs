@@ -30,9 +30,9 @@ namespace ImageQuantization
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();
-            ImageOperations.ConstructGraph(ImageMatrix);
+            double answer = ImageOperations.ConstructGraph(ImageMatrix);
             Colors.Text = ImageOperations.get_numColors().ToString();
-            Costs.Text = ImageOperations.generateMstCost().ToString();
+            Costs.Text = answer.ToString();
         }
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
@@ -64,6 +64,11 @@ namespace ImageQuantization
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Colors_TextChanged(object sender, EventArgs e)
         {
 
         }

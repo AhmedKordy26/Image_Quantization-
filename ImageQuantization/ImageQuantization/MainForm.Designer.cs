@@ -255,6 +255,7 @@ namespace ImageQuantization
             this.Colors.Name = "Colors";
             this.Colors.Size = new System.Drawing.Size(75, 27);
             this.Colors.TabIndex = 18;
+            this.Colors.TextChanged += new System.EventHandler(this.Colors_TextChanged);
             // 
             // label7
             // 
