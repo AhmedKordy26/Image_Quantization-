@@ -21,66 +21,69 @@ namespace ImageQuantization
     {
         public double red, green, blue;
     }
-    public struct edge
-    {
-        public int from, to;
-        public double cost;
-        
-    }
+
+
     /// <summary>
     /// Library of static functions that deal with images
     /// </summary>
     public class ImageOperations
     {
+        static public int numColors;
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
         /// <param name="ImagePath">Image file path</param>
 
         /// <returns>2D array of colors</returns>
-        static int numColors;
-        static double mstCost;
-        static double[,] adjMatrix;
         private static double euclideanDistance(RGBPixel first, RGBPixel second)//O(1)
         {
-            double x = (first.red - second.red) * (first.red - second.red);
-            double y = (first.green - second.green) * (first.green - second.green);
-            double z = (first.blue - second.blue) * (first.blue- second.blue);
-            return Math.Sqrt(x + y + z);
+            double x = (first.red - second.red) * (first.red - second.red);//O(1)
+            double y = (first.green - second.green) * (first.green - second.green);//O(1)
+            double z = (first.blue - second.blue) * (first.blue - second.blue);//O(1)
+            return Math.Sqrt(x + y + z); // ~//O(1)
         }
-        
-        bool compare(edge a,edge b)//O(1)
-        {
-            return a.cost < b.cost;
-        }
-        public static double generateMstCost(List<edge> allEdges ) // O(E log V) where n is the number of distinct colors
-        {
 
-            allEdges.Sort((s1, s2) => s1.cost.CompareTo(s2.cost));// O (E log E )
-            DSU UF = new DSU(numColors * numColors);
-            mstCost = 0;
-            int cur = 0;
-            edge tmp = new edge();
-            while (cur< allEdges.Count)// O ( E log V )
+        public static double generateMstCost(List<RGBPixel> UniquePixelList) // O(E log V) where n is the number of distinct colors
+        {
+            //var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            double[] costs = new double[numColors + 1]; // cost of unused nodes 
+            int[] prevNode = new int[numColors + 1]; // previous node for every node ,, using this arr to construct the mst edges 
+            bool[] Used = new bool[numColors + 1];
+            costs[0] = 0;
+            double mstCost = 0;
+            double minValue;
+            for (int i = 0; i < numColors; ++i)
             {
-                tmp = allEdges[cur];
-                if(UF.IsSameGroup(tmp.from,tmp.to)==false)
-                {
-                    mstCost += tmp.cost;
-                    UF.link(tmp.from, tmp.to);
-                }
-                cur++;
+                costs[i] = double.MaxValue; // fill all nodes with INF 
+                prevNode[i] = -1;
             }
-            Console.WriteLine(mstCost);
+            int currentNode = 0, minNode = -1;
+            int numUsedNodes = 1;
+            while (numUsedNodes < numColors)
+            {
+                Used[currentNode] = true; minValue = 1e10;
+                for (int i = 0; i < numColors; ++i)
+                {
+                    if (Used[i] == true) continue;
+                    if (euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]) < costs[i])
+                        costs[i] = euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]);
+                    if (costs[i] < minValue)
+                    {
+                        minValue = costs[i];
+                        minNode = i;
+                    }
+                }
+                mstCost += minValue;
+                prevNode[minNode] = currentNode;
+                currentNode = minNode;
+                numUsedNodes++;
+            }
             return mstCost;
-        }
-        public static int get_numColors()
-        {
-            return numColors;
-        }
-        public static double  get_mstCost()
-        {
-            return mstCost;
+            /*   watch.Stop();
+               var elapsedMs = watch.ElapsedMilliseconds;
+               return (double)(elapsedMs/1000);
+               */
         }
         public static RGBPixel[,] OpenImage(string ImagePath)
         {
@@ -145,44 +148,23 @@ namespace ImageQuantization
         //////////////////////// Constructing Graph //////
         public static double ConstructGraph(RGBPixel[,] ImageMatrix) // O( N*M) where N is the width and M is the height
         {
-            HashSet<RGBPixel> UniquePixelSet = new HashSet<RGBPixel>();
-            List<RGBPixel> UniquePixelList = new List<RGBPixel>();
-            for (int x = 0; x < GetHeight(ImageMatrix); ++x)// O( N*M) where N is the width and M is the height
+            List<RGBPixel> UniquePixelList = new List<RGBPixel>();//O(1)
+            bool[,,] Used = new bool[256, 256, 256];
+            int height = GetHeight(ImageMatrix);
+            int width = GetWidth(ImageMatrix);
+            for (int x = 0; x < height; ++x)// O( N*M) where N is the width and M is the height
             {
-                for (int y = 0; y < GetWidth(ImageMatrix); ++y)
+                for (int y = 0; y < width; ++y)
                 {
-                    if (UniquePixelSet.Contains(ImageMatrix[x,y]) == false)
+                    if (Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] == false)
                     {
-                        UniquePixelSet.Add(ImageMatrix[x, y]);
-                        UniquePixelList.Add(ImageMatrix[x, y]);
+                        Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] = true;
+                        UniquePixelList.Add(ImageMatrix[x, y]);//O(1)
                     }
                 }
             }
-            numColors = UniquePixelSet.Count;
-            adjMatrix = new double[UniquePixelSet.Count+1,UniquePixelSet.Count+1];
-            for(int i=0;i<numColors;++i) //  adjMatrix // O(N^2) where N is the number of distinct colors
-            {
-                for(int j=0;j<numColors;++j)
-                {
-                    adjMatrix[i, j] = euclideanDistance(UniquePixelList[i],UniquePixelList[j]);
-                }
-            }
-            List<edge> allEdges = new List<edge>();
-            edge tmp = new edge();
-            for (int i = 0; i < numColors; ++i) //  adjMatrix // O(N^2)
-            {
-                for (int j = 0; j < numColors; ++j)
-                {
-                    if (i != j)
-                    {
-                        tmp.from = i;
-                        tmp.to = j;
-                        tmp.cost = adjMatrix[i, j];
-                        allEdges.Add(tmp);
-                    }
-                }
-            }
-            return generateMstCost(allEdges);// O (N^2)
+            numColors = UniquePixelList.Count;//O(1)
+            return generateMstCost(UniquePixelList);// O (N^2)
         }
         //////////////////////////////
         /// <summary>
@@ -244,22 +226,21 @@ namespace ImageQuantization
         }
 
 
-       /// <summary>
-       /// Apply Gaussian smoothing filter to enhance the edge detection 
-       /// </summary>
-       /// <param name="ImageMatrix">Colored image matrix</param>
-       /// <param name="filterSize">Gaussian mask size</param>
-       /// <param name="sigma">Gaussian sigma</param>
-       /// <returns>smoothed color image</returns>
+        /// <summary>
+        /// Apply Gaussian smoothing filter to enhance the edge detection 
+        /// </summary>
+        /// <param name="ImageMatrix">Colored image matrix</param>
+        /// <param name="filterSize">Gaussian mask size</param>
+        /// <param name="sigma">Gaussian sigma</param>
+        /// <returns>smoothed color image</returns>
         public static RGBPixel[,] GaussianFilter1D(RGBPixel[,] ImageMatrix, int filterSize, double sigma)
         {
             int Height = GetHeight(ImageMatrix);
             int Width = GetWidth(ImageMatrix);
-
             RGBPixelD[,] VerFiltered = new RGBPixelD[Height, Width];
             RGBPixel[,] Filtered = new RGBPixel[Height, Width];
 
-           
+
             // Create Filter in Spatial Domain:
             //=================================
             //make the filter ODD size
