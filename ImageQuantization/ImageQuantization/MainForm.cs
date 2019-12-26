@@ -28,20 +28,34 @@ namespace ImageQuantization
                 ImageOperations.DisplayImage(ImageMatrix, pictureBox1);
 
             }
+            
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();
+            //////// measuring time  ////////
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             double answer = ImageOperations.ConstructGraph(ImageMatrix);
+            watch.Stop();
+            var elapsedSec = (watch.ElapsedMilliseconds)/1000.0;
+            Console.WriteLine("Time elapsed in constructing graph is : " + elapsedSec);
+            ////////////////////////////////
             Colors.Text = ImageOperations.numColors.ToString();
             Costs.Text = answer.ToString();
         }
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
         {
-            ImageOperations.ConstructGraph(ImageMatrix);
-
             double sigma = double.Parse(txtGaussSigma.Text);
-            int maskSize = (int)nudMaskSize.Value;
-            ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+            int maskSize = 1;
+            maskSize = (int)nudMaskSize.Value;
+            //////// measuring time  ////////
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            ImageOperations.colorPalette(maskSize);
+            ImageOperations.assignNewColors(ImageMatrix);
+            watch.Stop();
+            var elapsedSec = (watch.ElapsedMilliseconds) / 1000.0;
+            Console.WriteLine("Time elapsed in Clustering is : " + elapsedSec);
+            ///////////////////////////////
+            //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, 50, sigma);
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
         }
 
@@ -51,6 +65,11 @@ namespace ImageQuantization
         }
 
         private void Colors_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nudMaskSize_ValueChanged(object sender, EventArgs e)
         {
 
         }

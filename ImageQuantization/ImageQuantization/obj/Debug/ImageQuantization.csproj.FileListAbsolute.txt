@@ -30,11 +30,11 @@ C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\[TEMPLATE] Im
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\[TEMPLATE] ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.exe
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\[TEMPLATE] ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.pdb
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\[TEMPLATE] ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.csprojResolveAssemblyReference.cache
-C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.exe
-C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.pdb
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\bin\Debug\ImageQuantization.exe
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\bin\Debug\ImageQuantization.pdb
-C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.csprojResolveAssemblyReference.cache
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.MainForm.resources
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.Properties.Resources.resources
 C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.csproj.GenerateResource.Cache
+C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.exe
+C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.pdb
+C:\Users\akord\Desktop\AlgoProject\Image Quantization Startup Code\ImageQuantization\ImageQuantization\obj\Debug\ImageQuantization.csprojResolveAssemblyReference.cache

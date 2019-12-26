@@ -28,7 +28,33 @@ namespace ImageQuantization
     /// </summary>
     public class ImageOperations
     {
-        static public int numColors;
+        static public int numColors;// O(1)
+        static private List<RGBPixel> UniquePixelList;// O(1)
+        static private List<Tuple<double, int, int>> edges;// O(1)
+        static private int currentNumEdges;// O(1)
+        static private RGBPixel[,,] repColor;// O(1)
+        static private bool[] visColor;// O(1)
+        static private List<int>[] adjList;// O(1)
+        static private List<List<int>> groubs;// O(1)
+        static private List<int> tmpList;// O(1)
+
+        static public List<Tuple<double, int, int>> get_edges()// O(1)
+        {
+            return edges;// O(1)
+        }
+        static public void set_edges(List<Tuple<double, int, int>> X) // O(1)
+        {
+            currentNumEdges = X.Count; // O(1)
+            edges = X; // O(1)
+        }
+        static public List<RGBPixel> get_UniquePixelList()// O(1)
+        {
+            return UniquePixelList;// O(1)
+        }
+        static public void set_UniquePixelList(List<RGBPixel> X)// O(1)
+        {
+            UniquePixelList = X;// O(1)
+        }
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
@@ -40,50 +66,48 @@ namespace ImageQuantization
             double x = (first.red - second.red) * (first.red - second.red);//O(1)
             double y = (first.green - second.green) * (first.green - second.green);//O(1)
             double z = (first.blue - second.blue) * (first.blue - second.blue);//O(1)
-            return Math.Sqrt(x + y + z); // ~//O(1)
+            return Math.Sqrt(x + y + z);  //~O(1)
         }
 
-        public static double generateMstCost(List<RGBPixel> UniquePixelList) // O(E log V) where n is the number of distinct colors
+        public static double generateMstCost() // O(N^2) 
         {
-            //var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            double[] costs = new double[numColors + 1]; // cost of unused nodes 
-            int[] prevNode = new int[numColors + 1]; // previous node for every node ,, using this arr to construct the mst edges 
-            bool[] Used = new bool[numColors + 1];
-            costs[0] = 0;
-            double mstCost = 0;
-            double minValue;
-            for (int i = 0; i < numColors; ++i)
+            double[] costs = new double[numColors + 1];// O(1)   cost of unused nodes 
+            bool[] Used = new bool[numColors + 1]; // O(1)
+            List<Tuple<double, int, int>> myEdges = new List<Tuple<double, int, int>>(); // O(1)
+            costs[0] = 0; //O(1)
+            double mstCost = 0; //O(1)
+            double minValue;  //O(1)
+            for (int i = 0; i < numColors; ++i)  //O(N)
             {
-                costs[i] = double.MaxValue; // fill all nodes with INF 
-                prevNode[i] = -1;
+                costs[i] = double.MaxValue; // O(1)    fill all nodes with INF 
             }
-            int currentNode = 0, minNode = -1;
-            int numUsedNodes = 1;
-            while (numUsedNodes < numColors)
+            int currentNode = 0, minNode = -1;  //O(1)
+            int numUsedNodes = 1;  //O(1)
+            while (numUsedNodes < numColors) // O(N^2)
             {
-                Used[currentNode] = true; minValue = 1e10;
-                for (int i = 0; i < numColors; ++i)
+                Used[currentNode] = true; minValue = 1e10; //O(1)
+                for (int i = 0; i < numColors; ++i) //O(N)
                 {
-                    if (Used[i] == true) continue;
-                    if (euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]) < costs[i])
-                        costs[i] = euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]);
-                    if (costs[i] < minValue)
+                    if (Used[i] == true) continue; //O(1)
+                    if (euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]) < costs[i]) //O(1)
                     {
-                        minValue = costs[i];
-                        minNode = i;
+                        costs[i] = euclideanDistance(UniquePixelList[currentNode], UniquePixelList[i]); //O(1)
+                    }
+                    if (costs[i] < minValue)//O(1)
+                    {
+                        minValue = costs[i]; //O(1)
+                        minNode = i; //O(1)
                     }
                 }
-                mstCost += minValue;
-                prevNode[minNode] = currentNode;
-                currentNode = minNode;
-                numUsedNodes++;
+                mstCost += minValue; //O(1)
+                myEdges.Add(Tuple.Create(euclideanDistance(UniquePixelList[minNode], UniquePixelList[currentNode]), currentNode, minNode)); //O(1)
+                currentNode = minNode; //O(1)
+                numUsedNodes++; //O(1)
             }
-            return mstCost;
-            /*   watch.Stop();
-               var elapsedMs = watch.ElapsedMilliseconds;
-               return (double)(elapsedMs/1000);
-               */
+            myEdges.Sort();//O(N Log(N))
+            set_edges(myEdges); //O(1)
+            return mstCost; //O(1)
         }
         public static RGBPixel[,] OpenImage(string ImagePath)
         {
@@ -144,28 +168,96 @@ namespace ImageQuantization
 
             return Buffer;
         }
-
-        //////////////////////// Constructing Graph //////
-        public static double ConstructGraph(RGBPixel[,] ImageMatrix) // O( N*M) where N is the width and M is the height
+        private static List<List<int>> getGroubs(int maskSize) // O(N)
         {
-            List<RGBPixel> UniquePixelList = new List<RGBPixel>();//O(1)
-            bool[,,] Used = new bool[256, 256, 256];
-            int height = GetHeight(ImageMatrix);
-            int width = GetWidth(ImageMatrix);
-            for (int x = 0; x < height; ++x)// O( N*M) where N is the width and M is the height
+
+            adjList = new List<int>[numColors + 1]; // O(1)
+            visColor = new bool[numColors + 1]; // O(1)
+            for (int i = 0; i < numColors; ++i) // O(N)
             {
-                for (int y = 0; y < width; ++y)
+                adjList[i] = new List<int>(); // O(1)
+            }
+            for (int i = 0; i < numColors - 1; ++i)  // O(N)
+            {
+                adjList[edges[i].Item2].Add(edges[i].Item3);// O(1)
+                adjList[edges[i].Item3].Add(edges[i].Item2);// O(1)
+            }
+            DSU Uf = new DSU(numColors);// O(N)
+            int cur = 0;// O(1)
+            while (Uf.numGroubs() > maskSize) //O(N)
+            {
+                if (Uf.IsSameGroup(edges[cur].Item2, edges[cur].Item3) == false) //O(1)
                 {
-                    if (Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] == false)
+                    Uf.link(edges[cur].Item2, edges[cur].Item3); //O(1)
+                }
+                cur++;// O(1)
+            }
+            return Uf.ConectedComponents(); // O(N)
+        }
+        public static void colorPalette(int maskSize)
+        {
+            repColor = new RGBPixel[256, 256, 256]; // O(1)
+            groubs = getGroubs(maskSize);  // O(N)
+            int curGroub = 0; // O(1)
+            RGBPixelD centroid; // O(1)
+            for (int i = 0; i < groubs.Count; ++i) // O(N^2)
+            {
+                curGroub++; // O(1)
+                centroid.red = 0; centroid.green = 0; centroid.blue = 0; // O(1)
+                for (int j = 0; j < groubs[i].Count; ++j)// O(N)
+                {
+                    centroid.red += UniquePixelList[groubs[i][j]].red;// O(1)
+                    centroid.blue += UniquePixelList[groubs[i][j]].blue;// O(1)
+                    centroid.green += UniquePixelList[groubs[i][j]].green;// O(1)
+                }
+                centroid.red = centroid.red / (groubs[i].Count);// O(1)
+                centroid.green = centroid.green / (groubs[i].Count);// O(1)
+                centroid.blue = centroid.blue / (groubs[i].Count);// O(1)
+                for (int j = 0; j < groubs[i].Count; ++j) // O(N)
+                {
+                    repColor[UniquePixelList[groubs[i][j]].red, UniquePixelList[groubs[i][j]].green, UniquePixelList[groubs[i][j]].blue].red = (byte)(centroid.red);// O(1)
+                    repColor[UniquePixelList[groubs[i][j]].red, UniquePixelList[groubs[i][j]].green, UniquePixelList[groubs[i][j]].blue].green = (byte)(centroid.green);// O(1)
+                    repColor[UniquePixelList[groubs[i][j]].red, UniquePixelList[groubs[i][j]].green, UniquePixelList[groubs[i][j]].blue].blue = (byte)(centroid.blue);// O(1)
+                }
+            }
+
+        }
+        public static void assignNewColors(RGBPixel[,] ImageMatrix) //O(W*H)
+        {
+            int height = GetHeight(ImageMatrix); // O(1)
+            int width = GetWidth(ImageMatrix); // O(1)
+            for (int x = 0; x < height; ++x)// O( W*H) where N is the width and M is the height
+            {
+                for (int y = 0; y < width; ++y) //O(W)
+                {
+                    ImageMatrix[x, y] = repColor[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue];// O(1)
+                }
+            }
+        }
+        
+        //////////////////////// Constructing Graph //////
+        public static double ConstructGraph(RGBPixel[,] ImageMatrix) // O(N*M) where N is the width and M is the height
+        {
+            UniquePixelList = new List<RGBPixel>();     //O(1)
+            bool[,,] Used = new bool[256, 256, 256];     //O(1)
+            int height = GetHeight(ImageMatrix);     //O(1)
+            int width = GetWidth(ImageMatrix);     //O(1)
+            for (int x = 0; x < height; ++x)    // O(height * width) where N is the width and M is the height
+            {
+                for (int y = 0; y < width; ++y)  // O(width)
+                {
+                    if (Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] == false) //O(1)
                     {
-                        Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] = true;
-                        UniquePixelList.Add(ImageMatrix[x, y]);//O(1)
+                        Used[ImageMatrix[x, y].red, ImageMatrix[x, y].green, ImageMatrix[x, y].blue] = true; //O(1)
+                        UniquePixelList.Add(ImageMatrix[x, y]);     //O(1)
                     }
                 }
             }
+
             numColors = UniquePixelList.Count;//O(1)
-            return generateMstCost(UniquePixelList);// O (N^2)
+            return generateMstCost();// O (N^2)
         }
+
         //////////////////////////////
         /// <summary>
         /// Get the height of the image 
