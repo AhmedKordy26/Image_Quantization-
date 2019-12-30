@@ -10,6 +10,7 @@ namespace ImageQuantization
 {
     public partial class MainForm : Form
     {
+        private double total = 0;
         public MainForm()
         {
             InitializeComponent();
@@ -19,6 +20,7 @@ namespace ImageQuantization
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
+            total = 0;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -36,7 +38,7 @@ namespace ImageQuantization
             double answer = ImageOperations.ConstructGraph(ImageMatrix);
             watch.Stop();
             var elapsedSec = (watch.ElapsedMilliseconds)/1000.0;
-            Console.WriteLine("Time elapsed in constructing graph is : " + elapsedSec);
+            total += elapsedSec;
             ////////////////////////////////
             Colors.Text = ImageOperations.numColors.ToString();
             Costs.Text = answer.ToString();
@@ -44,19 +46,16 @@ namespace ImageQuantization
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
         {
-            double sigma = double.Parse(txtGaussSigma.Text);
             int maskSize = 1;
-            maskSize = (int)nudMaskSize.Value;
-            //////// measuring time  ////////
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            maskSize = Math.Min((int)nudMaskSize.Value, ImageOperations.numColors);
+            var watch = System.Diagnostics.Stopwatch.StartNew(); //////// measuring time  ////////
             ImageOperations.colorPalette(maskSize);
             ImageOperations.assignNewColors(ImageMatrix);
+            ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
             watch.Stop();
             var elapsedSec = (watch.ElapsedMilliseconds) / 1000.0;
-            Console.WriteLine("Time elapsed in Clustering is : " + elapsedSec);
-            ///////////////////////////////
-            //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, 50, sigma);
-            ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
+            total += elapsedSec;
+            textBox1.Text = total.ToString();
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -70,6 +69,11 @@ namespace ImageQuantization
         }
 
         private void nudMaskSize_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
         }

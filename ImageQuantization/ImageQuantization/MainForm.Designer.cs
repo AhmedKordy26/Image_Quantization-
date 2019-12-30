@@ -35,19 +35,19 @@ namespace ImageQuantization
             this.label2 = new System.Windows.Forms.Label();
             this.btnGaussSmooth = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.txtHeight = new System.Windows.Forms.TextBox();
             this.nudMaskSize = new System.Windows.Forms.NumericUpDown();
             this.txtWidth = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtGaussSigma = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.Colors = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.Costs = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaskSize)).BeginInit();
@@ -117,7 +117,7 @@ namespace ImageQuantization
             this.btnGaussSmooth.Name = "btnGaussSmooth";
             this.btnGaussSmooth.Size = new System.Drawing.Size(109, 76);
             this.btnGaussSmooth.TabIndex = 5;
-            this.btnGaussSmooth.Text = "Gauss Smooth";
+            this.btnGaussSmooth.Text = "Cluster";
             this.btnGaussSmooth.UseVisualStyleBackColor = true;
             this.btnGaussSmooth.Click += new System.EventHandler(this.btnGaussSmooth_Click);
             // 
@@ -125,23 +125,12 @@ namespace ImageQuantization
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(841, 535);
+            this.label3.Location = new System.Drawing.Point(842, 552);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(94, 21);
             this.label3.TabIndex = 7;
             this.label3.Text = "Mask Size";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(841, 579);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(120, 21);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Gauss Sigma";
             // 
             // txtHeight
             // 
@@ -161,10 +150,10 @@ namespace ImageQuantization
             0,
             0,
             0});
-            this.nudMaskSize.Location = new System.Drawing.Point(969, 531);
+            this.nudMaskSize.Location = new System.Drawing.Point(970, 550);
             this.nudMaskSize.Margin = new System.Windows.Forms.Padding(4);
             this.nudMaskSize.Maximum = new decimal(new int[] {
-            10000000,
+            30000,
             0,
             0,
             0});
@@ -177,7 +166,7 @@ namespace ImageQuantization
             this.nudMaskSize.Size = new System.Drawing.Size(76, 27);
             this.nudMaskSize.TabIndex = 10;
             this.nudMaskSize.Value = new decimal(new int[] {
-            3,
+            2,
             0,
             0,
             0});
@@ -215,16 +204,6 @@ namespace ImageQuantization
             this.label6.TabIndex = 13;
             this.label6.Text = "Height";
             // 
-            // txtGaussSigma
-            // 
-            this.txtGaussSigma.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtGaussSigma.Location = new System.Drawing.Point(969, 576);
-            this.txtGaussSigma.Margin = new System.Windows.Forms.Padding(4);
-            this.txtGaussSigma.Name = "txtGaussSigma";
-            this.txtGaussSigma.Size = new System.Drawing.Size(75, 27);
-            this.txtGaussSigma.TabIndex = 14;
-            this.txtGaussSigma.Text = "1";
-            // 
             // panel1
             // 
             this.panel1.AutoScroll = true;
@@ -251,7 +230,7 @@ namespace ImageQuantization
             // Colors
             // 
             this.Colors.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Colors.Location = new System.Drawing.Point(737, 657);
+            this.Colors.Location = new System.Drawing.Point(703, 660);
             this.Colors.Margin = new System.Windows.Forms.Padding(4);
             this.Colors.Name = "Colors";
             this.Colors.Size = new System.Drawing.Size(75, 27);
@@ -262,7 +241,7 @@ namespace ImageQuantization
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(573, 660);
+            this.label7.Location = new System.Drawing.Point(539, 663);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(130, 21);
@@ -272,7 +251,7 @@ namespace ImageQuantization
             // Costs
             // 
             this.Costs.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Costs.Location = new System.Drawing.Point(737, 696);
+            this.Costs.Location = new System.Drawing.Point(703, 699);
             this.Costs.Margin = new System.Windows.Forms.Padding(4);
             this.Costs.Name = "Costs";
             this.Costs.Size = new System.Drawing.Size(75, 27);
@@ -283,30 +262,51 @@ namespace ImageQuantization
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(573, 696);
+            this.label8.Location = new System.Drawing.Point(539, 699);
             this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(89, 21);
             this.label8.TabIndex = 19;
             this.label8.Text = "MST Cost";
             // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(1139, 696);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(75, 27);
+            this.textBox1.TabIndex = 22;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(975, 696);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(99, 21);
+            this.label9.TabIndex = 21;
+            this.label9.Text = "Total Time";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1280, 750);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label9);
             this.Controls.Add(this.Costs);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.Colors);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.txtGaussSigma);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.txtWidth);
             this.Controls.Add(this.nudMaskSize);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.txtHeight);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnGaussSmooth);
@@ -337,19 +337,19 @@ namespace ImageQuantization
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnGaussSmooth;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtHeight;
         private System.Windows.Forms.NumericUpDown nudMaskSize;
         private System.Windows.Forms.TextBox txtWidth;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtGaussSigma;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.TextBox Colors;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox Costs;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label9;
     }
 }
 

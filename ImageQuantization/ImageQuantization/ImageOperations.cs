@@ -33,10 +33,7 @@ namespace ImageQuantization
         static private List<Tuple<double, int, int>> edges;// O(1)
         static private int currentNumEdges;// O(1)
         static private RGBPixel[,,] repColor;// O(1)
-        static private bool[] visColor;// O(1)
-        static private List<int>[] adjList;// O(1)
         static private List<List<int>> groubs;// O(1)
-        static private List<int> tmpList;// O(1)
 
         static public List<Tuple<double, int, int>> get_edges()// O(1)
         {
@@ -170,18 +167,6 @@ namespace ImageQuantization
         }
         private static List<List<int>> getGroubs(int maskSize) // O(N)
         {
-
-            adjList = new List<int>[numColors + 1]; // O(1)
-            visColor = new bool[numColors + 1]; // O(1)
-            for (int i = 0; i < numColors; ++i) // O(N)
-            {
-                adjList[i] = new List<int>(); // O(1)
-            }
-            for (int i = 0; i < numColors - 1; ++i)  // O(N)
-            {
-                adjList[edges[i].Item2].Add(edges[i].Item3);// O(1)
-                adjList[edges[i].Item3].Add(edges[i].Item2);// O(1)
-            }
             DSU Uf = new DSU(numColors);// O(N)
             int cur = 0;// O(1)
             while (Uf.numGroubs() > maskSize) //O(N)
@@ -315,98 +300,6 @@ namespace ImageQuantization
                 ImageBMP.UnlockBits(bmd);
             }
             PicBox.Image = ImageBMP;
-        }
-
-
-        /// <summary>
-        /// Apply Gaussian smoothing filter to enhance the edge detection 
-        /// </summary>
-        /// <param name="ImageMatrix">Colored image matrix</param>
-        /// <param name="filterSize">Gaussian mask size</param>
-        /// <param name="sigma">Gaussian sigma</param>
-        /// <returns>smoothed color image</returns>
-        public static RGBPixel[,] GaussianFilter1D(RGBPixel[,] ImageMatrix, int filterSize, double sigma)
-        {
-            int Height = GetHeight(ImageMatrix);
-            int Width = GetWidth(ImageMatrix);
-            RGBPixelD[,] VerFiltered = new RGBPixelD[Height, Width];
-            RGBPixel[,] Filtered = new RGBPixel[Height, Width];
-
-
-            // Create Filter in Spatial Domain:
-            //=================================
-            //make the filter ODD size
-            if (filterSize % 2 == 0) filterSize++;
-
-            double[] Filter = new double[filterSize];
-
-            //Compute Filter in Spatial Domain :
-            //==================================
-            double Sum1 = 0;
-            int HalfSize = filterSize / 2;
-            for (int y = -HalfSize; y <= HalfSize; y++)
-            {
-                //Filter[y+HalfSize] = (1.0 / (Math.Sqrt(2 * 22.0/7.0) * Segma)) * Math.Exp(-(double)(y*y) / (double)(2 * Segma * Segma)) ;
-                Filter[y + HalfSize] = Math.Exp(-(double)(y * y) / (double)(2 * sigma * sigma));
-                Sum1 += Filter[y + HalfSize];
-            }
-            for (int y = -HalfSize; y <= HalfSize; y++)
-            {
-                Filter[y + HalfSize] /= Sum1;
-            }
-
-            //Filter Original Image Vertically:
-            //=================================
-            int ii, jj;
-            RGBPixelD Sum;
-            RGBPixel Item1;
-            RGBPixelD Item2;
-
-            for (int j = 0; j < Width; j++)
-                for (int i = 0; i < Height; i++)
-                {
-                    Sum.red = 0;
-                    Sum.green = 0;
-                    Sum.blue = 0;
-                    for (int y = -HalfSize; y <= HalfSize; y++)
-                    {
-                        ii = i + y;
-                        if (ii >= 0 && ii < Height)
-                        {
-                            Item1 = ImageMatrix[ii, j];
-                            Sum.red += Filter[y + HalfSize] * Item1.red;
-                            Sum.green += Filter[y + HalfSize] * Item1.green;
-                            Sum.blue += Filter[y + HalfSize] * Item1.blue;
-                        }
-                    }
-                    VerFiltered[i, j] = Sum;
-                }
-
-            //Filter Resulting Image Horizontally:
-            //===================================
-            for (int i = 0; i < Height; i++)
-                for (int j = 0; j < Width; j++)
-                {
-                    Sum.red = 0;
-                    Sum.green = 0;
-                    Sum.blue = 0;
-                    for (int x = -HalfSize; x <= HalfSize; x++)
-                    {
-                        jj = j + x;
-                        if (jj >= 0 && jj < Width)
-                        {
-                            Item2 = VerFiltered[i, jj];
-                            Sum.red += Filter[x + HalfSize] * Item2.red;
-                            Sum.green += Filter[x + HalfSize] * Item2.green;
-                            Sum.blue += Filter[x + HalfSize] * Item2.blue;
-                        }
-                    }
-                    Filtered[i, j].red = (byte)Sum.red;
-                    Filtered[i, j].green = (byte)Sum.green;
-                    Filtered[i, j].blue = (byte)Sum.blue;
-                }
-
-            return Filtered;
         }
 
 
